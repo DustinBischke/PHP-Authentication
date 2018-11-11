@@ -66,11 +66,11 @@
     <body>
         <h1>Login</h1>
         <form method="post">
-            <label>Username</label>
+            <h2>Username</h2>
             <input type="text" name="username" />
-            <label>Password</label>
+            <h2>Password</h2>
             <input type="password" name="password" />
-            <input type="submit" value="Login" />
+            </br></br><input type="submit" value="Login" />
         </form>
         <a href="register.php">Register</a>
     </body>

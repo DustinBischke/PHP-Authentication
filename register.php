@@ -36,27 +36,40 @@
         $password = $_POST['password'];
         $password2 = $_POST['password2'];
 
-        if ($password == $password2)
+        if (preg_match(USERNAME_REGEX, $username))
         {
-            $query = "SELECT * FROM users WHERE username = '" . $username . "'";
-
-            if (mysqli_num_rows(mysqli_query($conn, $query)) == 0)
+            if ($password == $password2)
             {
-                $hash_password = password_hash($password, PASSWORD_DEFAULT);
-                //$hash_password = hash('sha256', $password);
-                $query = "INSERT INTO users (username, password) VALUES ('" . $username . "', '" . $hash_password . "')";
+                if (preg_match(PASSWORD_REGEX, $password))
+                {
+                    $query = "SELECT * FROM users WHERE username = '" . $username . "'";
 
-                mysqli_query($conn, $query);
-                header("location: welcome.html");
+                    if (mysqli_num_rows(mysqli_query($conn, $query)) == 0)
+                    {
+                        $hash_password = password_hash($password, PASSWORD_DEFAULT);
+                        $query = "INSERT INTO users (username, password) VALUES ('" . $username . "', '" . $hash_password . "')";
+
+                        mysqli_query($conn, $query);
+                        header("location: welcome.html");
+                    }
+                    else
+                    {
+                        echo 'User already exists';
+                    }
+                }
+                else
+                {
+                    echo 'Password does not meet required password complexity';
+                }
             }
             else
             {
-                echo 'User already exists';
+                echo 'Passwords do not match';
             }
         }
         else
         {
-            echo 'Passwords do not match';
+            echo 'Invalid username';
         }
     }
 ?>
@@ -68,12 +81,29 @@
     <body>
         <h1>Register</h1>
         <form method="post">
-            <label>Username</label>
-            <input type="text" name="username" />
-            <label>Password</label>
-            <input type="password" name="password" />
-            <input type="password" name="password2" />
-            <input type="submit" value="Register" />
+            <h2>Username</h2>
+            <ul>
+                <li>Between 4 - 16 characters</li>
+                <li>Must contain only Letters and Numbers</li>
+            </ul>
+            <input type="text" name="username" placeholder="Username" />
+            <h2>Password</h2>
+            <ul>
+                <li>Between 8 - 128 characters</li>
+                <li>Must contain at least 1 of each:
+                    <ul>
+                        <li>Lowercase Letter</li>
+                        <li>Uppercase Letter</li>
+                        <li>Number</li>
+                        <li>Special Character (ie: !@#$%^&*)</li>
+                    </ul>
+                </li>
+                <li>Cannot contain whitespace</li>
+            </ul>
+            <input type="password" name="password" placeholder="Password"/>
+            <h3>Repeat Password</h3>
+            <input type="password" name="password2" placeholder="Repeat Password"/>
+            </br></br><input type="submit" value="Register" />
         </form>
         <a href="login.php">Login</a>
     </body>
