@@ -42,7 +42,9 @@
 
             if (mysqli_num_rows(mysqli_query($conn, $query)) == 0)
             {
-                $query = "INSERT INTO users (username, password) VALUES ('" . $username . "', '" . $password . "')";
+                $hash_password = password_hash($password, PASSWORD_DEFAULT);
+                //$hash_password = hash('sha256', $password);
+                $query = "INSERT INTO users (username, password) VALUES ('" . $username . "', '" . $hash_password . "')";
 
                 mysqli_query($conn, $query);
                 header("location: welcome.html");
@@ -73,5 +75,6 @@
             <input type="password" name="password2" />
             <input type="submit" value="Register" />
         </form>
+        <a href="login.php">Login</a>
     </body>
 </html>

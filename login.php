@@ -35,11 +35,22 @@
         $username = $_POST['username'];
         $password = $_POST['password'];
 
-        $query = "SELECT * FROM users WHERE username = '" . $username . "' AND password = '" . $password . "'";
+        $query = "SELECT password FROM users WHERE username = '" . $username . "'";
+        $result = mysqli_query($conn, $query);
 
         if (mysqli_num_rows(mysqli_query($conn, $query)) == 1)
         {
-            header("location: welcome.html");
+            $row = mysqli_fetch_assoc(mysqli_query($conn, $query));
+            $hash_password = $row['password'];
+
+            if (password_verify($password, $hash_password))
+            {
+                header("location: welcome.html");
+            }
+            else
+            {
+                echo 'Invalid Login Credentials';
+            }
         }
         else
         {
@@ -50,7 +61,7 @@
 
 <html>
     <head>
-        <title>PHP Authentication</title>
+        <title>Login</title>
     </head>
     <body>
         <h1>Login</h1>
@@ -61,5 +72,6 @@
             <input type="password" name="password" />
             <input type="submit" value="Login" />
         </form>
+        <a href="register.php">Register</a>
     </body>
 </html>
