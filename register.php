@@ -50,7 +50,8 @@
                         $query = "INSERT INTO users (username, password) VALUES ('" . $username . "', '" . $hash_password . "')";
 
                         mysqli_query($conn, $query);
-                        header("location: welcome.html");
+                        setcookie('auth', $username, time() + 3600);
+                        header('location: private.php');
                     }
                     else
                     {

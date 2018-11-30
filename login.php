@@ -45,7 +45,8 @@
 
             if (password_verify($password, $hash_password))
             {
-                header("location: welcome.html");
+                setcookie('auth', $username, time() + 3600);
+                header('location: private.php');
             }
             else
             {
@@ -67,9 +68,9 @@
         <h1>Login</h1>
         <form method="post">
             <h2>Username</h2>
-            <input type="text" name="username" />
+            <input type="text" name="username" placeholder="Username"/>
             <h2>Password</h2>
-            <input type="password" name="password" />
+            <input type="password" name="password" placeholder="Password"/>
             </br></br><input type="submit" value="Login" />
         </form>
         <a href="register.php">Register</a>
