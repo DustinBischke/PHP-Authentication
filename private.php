@@ -1,6 +1,4 @@
 <?php
-    header('Cache-Control: no-cache, must-revalidate');
-
     if(!isset($_COOKIE['auth']))
     {
         header('location: login.php');
@@ -13,6 +11,7 @@
     </head>
     <body>
         <h1>Welcome</h1>
+        <a href="change_password.php">Change Password</a>
         <a href="logout.php">Logout</a>
     </body>
 </html>

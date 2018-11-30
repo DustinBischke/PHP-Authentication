@@ -36,7 +36,6 @@
         $password = $_POST['password'];
 
         $query = "SELECT password FROM users WHERE username = '" . $username . "'";
-        $result = mysqli_query($conn, $query);
 
         if (mysqli_num_rows(mysqli_query($conn, $query)) == 1)
         {
