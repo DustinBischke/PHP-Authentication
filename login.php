@@ -41,21 +41,42 @@
         {
             $row = mysqli_fetch_assoc(mysqli_query($conn, $query));
             $hash_password = $row['password'];
+            $attempts = $row['attempts'];
+            $lockout = $row['lockout'];
 
+            $now = new DateTime(null, new DateTimeZone('Europe/Dublin'));
+            $now->getTimezone();
+            $now = $now->format('Y-m-d H:i:s');
+
+            $minutes = 5;
+            $difference = round((strtotime($now) - strtotime($lockout)) / (60 * $minutes), 1);
+
+            # Correct Password
             if (password_verify($password, $hash_password))
             {
-                setcookie('auth', $username, time() + 3600);
-                header('location: private.php');
+                if ($lockout == null)
+                {
+                    setcookie('auth', $username, time() + 3600);
+                    header('location: private.php');
+                }
+                else
+                {
+                    if ($difference >= 1)
+                    {
+                        $query = "UPDATE users SET attempts = 0, lockout = null WHERE username = '" . $username . "'";
+                        mysqli_query($conn, $query);
+
+                        setcookie('auth', $username, time() + 3600);
+                        header('location: private.php');
+                    }
+                    else
+                    {
+                        echo 'Locked out for 5 Minutes';
+                    }
+                }
             }
             else
             {
-                $now = new DateTime(null, new DateTimeZone('Europe/Dublin'));
-                $now->getTimezone();
-                $now = $now->format('Y-m-d H:i:s');
-
-                $attempts = $row['attempts'];
-                $lockout = $row['lockout'];
-
                 if ($attempts < 3)
                 {
                     $attempts = $attempts + 1;
@@ -68,9 +89,6 @@
                 {
                     if ($lockout != null)
                     {
-                        $minutes = 5;
-                        $difference = round((strtotime($now) - strtotime($lockout)) / (60 * $minutes), 1);
-
                         if ($difference >= 1)
                         {
                             $query = "UPDATE users SET attempts = 0, lockout = null WHERE username = '" . $username . "'";
