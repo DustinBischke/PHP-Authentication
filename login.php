@@ -83,7 +83,7 @@
                     $query = "UPDATE users SET attempts = " . $attempts . " WHERE username = '" . $username . "'";
                     mysqli_query($conn, $query);
 
-                    echo 'Invalid Login Credentials';
+                    echo 'Invalid Login Credentials for ' . htmlspecialchars($username, ENT_QUOTES, 'UTF-8');
                 }
                 else
                 {
@@ -101,7 +101,7 @@
                             }
                             else
                             {
-                                echo 'Invalid Login Credentials';
+                                echo 'Invalid Login Credentials for ' . htmlspecialchars($username, ENT_QUOTES, 'UTF-8');
                             }
                         }
                         else
@@ -121,7 +121,7 @@
         }
         else
         {
-            echo 'Invalid Login Credentials';
+            echo 'Invalid Login Credentials for ' . htmlspecialchars($username, ENT_QUOTES, 'UTF-8');
         }
     }
 ?>
