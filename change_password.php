@@ -30,7 +30,7 @@
         $new_password = $_POST['new_password'];
         $new_password2 = $_POST['new_password2'];
 
-        $query = "SELECT password FROM users WHERE username = '" . $username . "'";
+        $query = "SELECT * FROM users WHERE username = '" . $username . "'";
 
         if (mysqli_num_rows(mysqli_query($conn, $query)) == 1)
         {
@@ -44,10 +44,12 @@
                     if (preg_match(PASSWORD_REGEX, $new_password))
                     {
                         $hash_password = password_hash($new_password, PASSWORD_DEFAULT);
-                        $query = "UPDATE users SET password = " . $hash_password . " WHERE username = '" . $username + "'";
+
+                        $query = "UPDATE users SET password = '" . $hash_password . "' WHERE username = '" . $username . "'";
 
                         mysqli_query($conn, $query);
-                        header('location: private.php');
+                        setcookie('auth', '', time() - 3600);
+                        header('location: index.html');
                     }
                     else
                     {
