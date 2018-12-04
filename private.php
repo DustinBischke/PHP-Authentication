@@ -3,6 +3,8 @@
     {
         header('location: login.php');
     }
+
+    $username = $_COOKIE['auth'];
 ?>
 
 <html>
@@ -10,7 +12,7 @@
         <title>Private</title>
     </head>
     <body>
-        <h1>Welcome</h1>
+        <h1>Welcome <?php echo $username;?></h1>
         <a href="change_password.php">Change Password</a>
         <a href="logout.php">Logout</a>
     </body>

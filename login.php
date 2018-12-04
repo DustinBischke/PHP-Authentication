@@ -53,14 +53,13 @@
                 $now->getTimezone();
                 $now = $now->format('Y-m-d H:i:s');
 
-                $query = "SELECT * FROM users WHERE username = '" . $username . "'";
-                $row = mysqli_fetch_assoc(mysqli_query($conn, $query));
                 $attempts = $row['attempts'];
                 $lockout = $row['lockout'];
 
                 if ($attempts < 3)
                 {
-                    $query = "UPDATE users SET attempts = " . $attempts + 1 . " WHERE username = '" . $username . "'";
+                    $attempts = $attempts + 1;
+                    $query = "UPDATE users SET attempts = " . $attempts . " WHERE username = '" . $username . "'";
                     mysqli_query($conn, $query);
 
                     echo 'Invalid Login Credentials';
@@ -77,11 +76,19 @@
                             $query = "UPDATE users SET attempts = 0, lockout = null WHERE username = '" . $username . "'";
                             mysqli_query($conn, $query);
 
-                            echo 'User ' . $username . ' is now unlocked :)';
+                            if (password_verify($password, $hash_password))
+                            {
+                                setcookie('auth', $username, time() + 3600);
+                                header('location: private.php');
+                            }
+                            else
+                            {
+                                echo 'Invalid Login Credentials';
+                            }
                         }
                         else
                         {
-                            echo 'User ' . $username . ' is locked out for 5 Minutes';
+                            echo 'Locked out for 5 Minutes';
                         }
                     }
                     else
@@ -89,7 +96,7 @@
                         $query = "UPDATE users SET lockout = '" . $now . "' WHERE username = '" . $username . "'";
                         mysqli_query($conn, $query);
 
-                        echo 'User ' . $username . ' is locked out for 5 Minutes';
+                        echo 'Locked out for 5 Minutes';
                     }
                 }
             }
