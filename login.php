@@ -22,7 +22,7 @@
 
     if (empty(mysqli_query($conn, $query)))
     {
-        $query = 'CREATE TABLE users (username varchar(255) NOT NULL, password varchar(255) NOT NULL, PRIMARY KEY(username))';
+        $query = 'CREATE TABLE users (username varchar(255) NOT NULL, password varchar(255) NOT NULL, attempts tinyint DEFAULT 0, lockout datetime, PRIMARY KEY(username))';
 
         if (!mysqli_query($conn, $query))
         {
@@ -35,7 +35,7 @@
         $username = $_POST['username'];
         $password = $_POST['password'];
 
-        $query = "SELECT password FROM users WHERE username = '" . $username . "'";
+        $query = "SELECT * FROM users WHERE username = '" . $username . "'";
 
         if (mysqli_num_rows(mysqli_query($conn, $query)) == 1)
         {
@@ -49,7 +49,49 @@
             }
             else
             {
-                echo 'Invalid Login Credentials';
+                $now = new DateTime(null, new DateTimeZone('Europe/Dublin'));
+                $now->getTimezone();
+                $now = $now->format('Y-m-d H:i:s');
+
+                $query = "SELECT * FROM users WHERE username = '" . $username . "'";
+                $row = mysqli_fetch_assoc(mysqli_query($conn, $query));
+                $attempts = $row['attempts'];
+                $lockout = $row['lockout'];
+
+                if ($attempts < 3)
+                {
+                    $query = "UPDATE users SET attempts = " . $attempts + 1 . " WHERE username = '" . $username . "'";
+                    mysqli_query($conn, $query);
+
+                    echo 'Invalid Login Credentials';
+                }
+                else
+                {
+                    if ($lockout != null)
+                    {
+                        $minutes = 5;
+                        $difference = round((strtotime($now) - strtotime($lockout)) / (60 * $minutes), 1);
+
+                        if ($difference >= 1)
+                        {
+                            $query = "UPDATE users SET attempts = 0, lockout = null WHERE username = '" . $username . "'";
+                            mysqli_query($conn, $query);
+
+                            echo 'User ' . $username . ' is now unlocked :)';
+                        }
+                        else
+                        {
+                            echo 'User ' . $username . ' is locked out for 5 Minutes';
+                        }
+                    }
+                    else
+                    {
+                        $query = "UPDATE users SET lockout = '" . $now . "' WHERE username = '" . $username . "'";
+                        mysqli_query($conn, $query);
+
+                        echo 'User ' . $username . ' is locked out for 5 Minutes';
+                    }
+                }
             }
         }
         else

@@ -22,7 +22,7 @@
 
     if (empty(mysqli_query($conn, $query)))
     {
-        $query = 'CREATE TABLE users (username varchar(255) NOT NULL, password varchar(255) NOT NULL, PRIMARY KEY(username))';
+        $query = 'CREATE TABLE users (username varchar(255) NOT NULL, password varchar(255) NOT NULL, attempts tinyint DEFAULT 0, lockout datetime, PRIMARY KEY(username))';
 
         if (!mysqli_query($conn, $query))
         {
