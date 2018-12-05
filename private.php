@@ -5,6 +5,13 @@
     }
 
     $username = $_COOKIE['auth'];
+
+    function preventxss($string)
+    {
+        $string = str_replace(array('<', '>', '&', '"', "'"), array('&lt;', '&gt;', '&amp;', '&quot;', '&apos;'), $string);
+
+        return $string;
+    }
 ?>
 
 <html>
@@ -12,7 +19,7 @@
         <title>Private</title>
     </head>
     <body>
-        <h1>Welcome <?php echo htmlspecialchars($username, ENT_QUOTES, 'UTF-8');?></h1>
+        <h1>Welcome <?php echo preventxss($username);?></h1>
         <a href="change_password.php">Change Password</a>
         <a href="logout.php">Logout</a>
     </body>
