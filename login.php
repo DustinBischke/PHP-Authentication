@@ -22,7 +22,7 @@
 
     if (empty(mysqli_query($conn, $query)))
     {
-        $query = 'CREATE TABLE users (username varchar(255) NOT NULL, password varchar(255) NOT NULL, attempts tinyint DEFAULT 0, lockout datetime, PRIMARY KEY(username))';
+        $query = 'CREATE TABLE users (username varchar(32) NOT NULL, password varchar(255) NOT NULL, attempts tinyint DEFAULT 0, lockout datetime, PRIMARY KEY(username))';
 
         if (!mysqli_query($conn, $query))
         {
@@ -41,6 +41,7 @@
         {
             $row = mysqli_fetch_assoc(mysqli_query($conn, $query));
             $hash_password = $row['password'];
+            $salt = $row['salt'];
             $attempts = $row['attempts'];
             $lockout = $row['lockout'];
 
@@ -50,6 +51,8 @@
 
             $minutes = 5;
             $difference = round((strtotime($now) - strtotime($lockout)) / (60 * $minutes), 1);
+
+            $password = $password . $salt;
 
             # Correct Password
             if (password_verify($password, $hash_password))

@@ -36,6 +36,9 @@
         {
             $row = mysqli_fetch_assoc(mysqli_query($conn, $query));
             $hash_password = $row['password'];
+            $salt = $row['salt'];
+
+            $password = $password . $salt;
 
             if (password_verify($password, $hash_password))
             {
@@ -43,9 +46,17 @@
                 {
                     if (preg_match(PASSWORD_REGEX, $new_password))
                     {
-                        $hash_password = password_hash($new_password, PASSWORD_DEFAULT);
+                        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                        $salt = '';
 
-                        $query = "UPDATE users SET password = '" . $hash_password . "' WHERE username = '" . $username . "'";
+                        for ($i = 0; $i < 16; $i++)
+                        {
+                            $salt = $salt . $characters[rand(0, strlen($characters) - 1)];
+                        }
+
+                        $hash_password = password_hash($new_password . $salt, PASSWORD_DEFAULT);
+
+                        $query = "UPDATE users SET password = '" . $hash_password . "', salt = '" . $salt . "' WHERE username = '" . $username . "'";
 
                         mysqli_query($conn, $query);
                         setcookie('auth', '', time() - 3600);

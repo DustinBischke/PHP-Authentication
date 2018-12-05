@@ -22,7 +22,7 @@
 
     if (empty(mysqli_query($conn, $query)))
     {
-        $query = 'CREATE TABLE users (username varchar(255) NOT NULL, password varchar(255) NOT NULL, attempts tinyint DEFAULT 0, lockout datetime, PRIMARY KEY(username))';
+        $query = 'CREATE TABLE users (username varchar(32) NOT NULL, password varchar(255) NOT NULL, salt varchar(16), attempts tinyint DEFAULT 0, lockout datetime, PRIMARY KEY(username))';
 
         if (!mysqli_query($conn, $query))
         {
@@ -46,8 +46,16 @@
 
                     if (mysqli_num_rows(mysqli_query($conn, $query)) == 0)
                     {
-                        $hash_password = password_hash($password, PASSWORD_DEFAULT);
-                        $query = "INSERT INTO users (username, password) VALUES ('" . $username . "', '" . $hash_password . "')";
+                        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                        $salt = '';
+
+                        for ($i = 0; $i < 16; $i++)
+                        {
+                            $salt = $salt . $characters[rand(0, strlen($characters) - 1)];
+                        }
+
+                        $hash_password = password_hash($password . $salt, PASSWORD_DEFAULT);
+                        $query = "INSERT INTO users (username, password, salt) VALUES ('" . $username . "', '" . $hash_password . "', '" . $salt . "')";
 
                         mysqli_query($conn, $query);
                         setcookie('auth', $username, time() + 3600);
